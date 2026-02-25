@@ -4,12 +4,12 @@ import { parse } from 'csv-parse/sync';
 
 const storage = new Storage();
 
-export const fileRouter = async (cloudevent) => {
+export const fileRouter = async (event) => {
   try {
     console.log("Received event");
 
-    // Decode Pub/Sub message
-    const gcsEvent = cloudevent.data;
+    // In Gen2 Cloud Functions, event IS the GCS payload
+    const gcsEvent = event;
 
     const fileName = gcsEvent.name;
     const sourceBucket = gcsEvent.bucket;
