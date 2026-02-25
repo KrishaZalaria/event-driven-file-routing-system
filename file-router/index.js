@@ -8,7 +8,7 @@ export const fileRouter = async (event) => {
   try {
     console.log("Received event");
     console.log("FULL EVENT:", JSON.stringify(event));
-
+git
     // In Gen2 Cloud Functions, event IS the GCS payload
     const gcsEvent = event;
 
