@@ -1,0 +1,11 @@
+{
+  "name": "hourly-report",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "dependencies": {
+    "@google-cloud/cloud-sql-connector": "^1.5.0",
+    "@google-cloud/storage": "^7.7.0",
+    "pg": "^8.11.0"
+  }
+}
