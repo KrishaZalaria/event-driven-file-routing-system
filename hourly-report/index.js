@@ -35,8 +35,8 @@ export const hourlyReport = async (req, res) => {
 
     // Generate CSV content
     let csvContent = '';
-
     const now = new Date();
+
     csvContent += `report_generated_at,${now.toISOString()}\n\n`;
     csvContent += `total_files,${summary.total_files}\n`;
     csvContent += `success_count,${summary.success_count}\n`;
@@ -47,22 +47,34 @@ export const hourlyReport = async (req, res) => {
       csvContent += `${row.destination_bucket},${row.file_count}\n`;
     });
 
-    // Create filename (hour-level)
-    const filename = `report-${now.toISOString().slice(0,13)}.csv`;
+    // -------- New Naming Strategy --------
 
-    // Upload to GCS
+    const executionTimestamp = now.toISOString().replace(/:/g, '-');
+    const hourPrefix = now.toISOString().slice(0, 13); // YYYY-MM-DDTHH
+
+    const uniqueFilename = `report-${executionTimestamp}.csv`;
+    const latestFilename = `report-${hourPrefix}-latest.csv`;
+
+    // Upload unique file (history preserved)
     await storage
       .bucket(REPORTS_BUCKET)
-      .file(filename)
-      .save(csvContent, {
-        contentType: 'text/csv',
-      });
+      .file(uniqueFilename)
+      .save(csvContent, { contentType: 'text/csv' });
 
-    console.log(`Report uploaded as ${filename}`);
+    console.log(`Unique report uploaded: ${uniqueFilename}`);
+
+    // Upload / overwrite latest file (stable reference)
+    await storage
+      .bucket(REPORTS_BUCKET)
+      .file(latestFilename)
+      .save(csvContent, { contentType: 'text/csv' });
+
+    console.log(`Latest report updated: ${latestFilename}`);
 
     res.status(200).json({
       message: 'Report generated successfully',
-      file: filename,
+      unique_file: uniqueFilename,
+      latest_file: latestFilename,
       summary,
       breakdown
     });
